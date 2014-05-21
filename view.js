@@ -1,5 +1,5 @@
     var transitionstuff = (Modernizr.prefixed('transition') + "end");
-    var cardCount = 0;
+    var cardCounts = 0;
     var width = 0;
     var height = 0;///ratio * width;
     var offset = 0;
@@ -45,26 +45,17 @@
     }
     
     function resizeCards() {
-        numP = $(".post").length - $(".card").length;
-        setNumP(numP);
+        numP = $(".post").length - $(".back").length;
         console.log(numP);
         $(".post").not(".back").hide("slow", function() {
             $(this).remove();
-            reduceNumP();
             console.log(getNumP());
-            if(getNumP() == 0){
+            if($(".post").not(".back").length == 0){
                 console.log("did first return");
                 setNumP($(".post_no_info_bar").length);
                 resizeCards1();            
             }
         });
-        /*.promise()
-        .done(function(){
-            console.log("did first return");
-            setNumP($(".post_no_info_bar").length);
-            //return ($(".post_no_info_bar"));
-            resizeCards1();
-        });*/
     }
     function resizeCards1() {
         $(".post_no_info_bar").each( function(){
@@ -75,7 +66,6 @@
                 if(getNumP() == 0) {
                     console.log("did second return");
                     setNumP($(".post").length);
-                    //return ($(".post"));
                     resizeCards2();
                 }
             });
@@ -110,7 +100,40 @@
         document.getElementById("sidebar").style.right = a;   
     }
     function okayOrNot() {
-        var cardCounts = 0;//$(".back").length;
+        cardCounts = $(".back").length;
+        $(".post").not(".back").filter(".photo0").each(function() {
+            $pnib = $(this).children(".post_no_info_bar");
+            $pic = $pnib.children(".photo");
+            if ($pic.height() >= (ratio * $pic.width())){
+                if(cardCounts < numCard) {
+                    cardCounts++;
+                    $(this).addClass("back");
+            
+                    var temp = document.createElement('div');
+                    temp.setAttribute("class", "card");
+                    temp.setAttribute("id", "c"+cardCounts);
+                    $card = $(temp);
+                    $card.css("position", "absolute"); 
+                    //$card.attr("id", );
+                    $card.appendTo(".posts");
+                    $(this).appendTo($card);
+                
+                    console.log(cardCounts);
+               }
+            }
+               
+        });
+        if(cardCounts < numCard) {
+            //alert("Scroll more");
+            console.log("Scroll more");
+        }
+        else {
+            calculateOffset();
+            calculateCardWidth();
+            deleteStuff();
+            resizeCards();    
+        }
+        /*var cardCounts = 0;//$(".back").length;
         $(".post_no_info_bar" ).filter(".photo1").each( function() {
            if (((1/0.94) * ($(this).height()) - $(this).children(".caption_div").height()) >= (ratio * (1/0.94) * $(this).width())){
                if(cardCounts < numCard) {
@@ -129,37 +152,20 @@
             setNumP(numCard);
             $(".back").each(function(){
                 reduceNumP();
-                $card = $(document.createElement('div')); 
+                var temp = document.createElement('div');
+                temp.className = "card";
+                $card = $(temp);
                 $card.css("position", "absolute"); 
-                //$card.css("left", $(this).position().left);
-                //$card.css("top", $(this).position().top);
-                $card.attr("class","card");
                 $card.attr("id", $(this).attr("id"));
-                //$inner = $(document.createElement('div')); 
-                //$inner.css("position", "relative");
-                //$inner.css("class", "relative_inner");
                 $(this).removeAttr("id");
-                //$copy = $(this).clone();
-                //$copy.appendTo($card);
-                //$(this).css(Modernizr.prefixed('transition')+"-duration", "0s");
-                //$(this).hide();
-                //$(this).css("left",0);
-                //$(this).css("top",0);
                 $card.appendTo(".posts");
-                //$inner.appendTo($card);
                 $(this).appendTo($card);
-                //$(this).show();
-                //$copy.remove();
-                //$(this).css(Modernizr.prefixed('transition')+"-duration", "0.2s");
-                
             });
-            //if(getNumP()== 0){
-                calculateOffset();
-                calculateCardWidth();
-                deleteStuff();
-                resizeCards();    
-            //}
-        }    
+            calculateOffset();
+            calculateCardWidth();
+            deleteStuff();
+            resizeCards();    
+        } */   
     }
     
     function createHolder() {
@@ -282,7 +288,7 @@
                                 setTimeout(function () {
                                     $(".clone").remove();
                                     $(".card").show();
-                                    //flipCards();
+                                    flipCards();
                                 }, 400);
                             }
                         });
@@ -303,14 +309,14 @@
         $front.attr("class","front");
         $back = $("#"+id).find(".back");
         $front.insertBefore($back);
-        $back = $("#"+id).find(".back").position();
+        //$back = $("#"+id).find(".back").position();
         $front.css(Modernizr.prefixed('transform'),"rotateY(0deg)");
         $back.css(Modernizr.prefixed('transform'),"rotateY(180deg)");
     }
     function flipCard(deckNum){
         var depth = $("#w"+(deckNum)).find(".post_overlay").length;
         if (depth != 0){
-            yesFlipMe($("#w"+(deckNum)).find(".post_overlay")[depth].attr("id"));
+            yesFlipMe($("#w"+(deckNum)).find(".post_overlay")[depth].id);
         }
     }
     function flipCards(){
@@ -375,3 +381,4 @@
             style.appendChild(document.createTextNode(css));
         document.getElementsByTagName("head")[0].appendChild(style);
     }
+    
