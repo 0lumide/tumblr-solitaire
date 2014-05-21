@@ -1,3 +1,4 @@
+
     var transitionstuff = (Modernizr.prefixed('transition') + "end");
     var cardCounts = 0;
     var width = 0;
@@ -23,7 +24,7 @@
 
     function calculateCardWidth() {
         var playArea = $(window).width() - (leftMar + rightMar);
-        width = (playArea - (space * 7))/7;
+        width = (playArea - (space * 6))/7;
         ex = 0.04 * width;
         height = (ratio * width) + ex;
         push = pushRatio * height;
@@ -49,7 +50,7 @@
         console.log(numP);
         $(".post").not(".back").hide("slow", function() {
             $(this).remove();
-            console.log(getNumP());
+            console.log($(".post").not(".back").length);
             if($(".post").not(".back").length == 0){
                 console.log("did first return");
                 setNumP($(".post_no_info_bar").length);
@@ -91,7 +92,9 @@
     function calculateOffset() {
         var wid = $(window).width();
         offset = ((wid -1190)/2);
-        zeroLeft = (leftMar - offset);
+        playArea = (7 * width) + (6 * space);
+        var le = ((wid - 50) - playArea)/2;
+        zeroLeft = (le - offset);
     }
     
     function createSpace() {
@@ -114,7 +117,6 @@
                     temp.setAttribute("id", "c"+cardCounts);
                     $card = $(temp);
                     $card.css("position", "absolute"); 
-                    //$card.attr("id", );
                     $card.appendTo(".posts");
                     $(this).appendTo($card);
                 
@@ -124,48 +126,14 @@
                
         });
         if(cardCounts < numCard) {
-            //alert("Scroll more");
             console.log("Scroll more");
         }
         else {
-            calculateOffset();
             calculateCardWidth();
+            calculateOffset();
             deleteStuff();
             resizeCards();    
         }
-        /*var cardCounts = 0;//$(".back").length;
-        $(".post_no_info_bar" ).filter(".photo1").each( function() {
-           if (((1/0.94) * ($(this).height()) - $(this).children(".caption_div").height()) >= (ratio * (1/0.94) * $(this).width())){
-               if(cardCounts < numCard) {
-                cardCounts++;
-                $(this).closest(".post").attr("id", "c"+cardCounts);
-                $(this).closest(".post").addClass("back");
-                console.log(cardCounts);
-               }
-           }
-        });
-        if(cardCounts < numCard) {
-            //alert("Scroll more");
-            console.log("Scroll more");
-        }
-        else {
-            setNumP(numCard);
-            $(".back").each(function(){
-                reduceNumP();
-                var temp = document.createElement('div');
-                temp.className = "card";
-                $card = $(temp);
-                $card.css("position", "absolute"); 
-                $card.attr("id", $(this).attr("id"));
-                $(this).removeAttr("id");
-                $card.appendTo(".posts");
-                $(this).appendTo($card);
-            });
-            calculateOffset();
-            calculateCardWidth();
-            deleteStuff();
-            resizeCards();    
-        } */   
     }
     
     function createHolder() {
@@ -195,13 +163,11 @@
             $("<div/>", {
                 id: "w" + i,
                 class: q1 + q2 + q3
-                //style: "position:absolute",
             }).prependTo(".posts");
             if (q1 == "ace"){
                 $("<div/>", {
                     //id: "w" + i,
                     class: "ainner"
-                    //style: "position:absolute",
                 }).prependTo("#w"+i);
             }
         }
@@ -264,7 +230,7 @@
                         $appendhere = $("#w"+(14 - i)).find(".post_overlay").last();
                         $orr.appendTo($appendhere);
                     }
-                    $orr.css(Modernizr.prefixed('transition')+"-duration", "0.2s");
+                    $orr1.css(Modernizr.prefixed('transition')+"-duration", "0.2s");
                     console.log("here");
                     if(j == 7){
                         $klone.css("left", pos.left+"px");
@@ -310,19 +276,31 @@
         $back = $("#"+id).find(".back");
         $front.insertBefore($back);
         //$back = $("#"+id).find(".back").position();
-        $front.css(Modernizr.prefixed('transform'),"rotateY(0deg)");
+        $back.css(Modernizr.prefixed('transform'));
+        $front.css(Modernizr.prefixed('transform'));
         $back.css(Modernizr.prefixed('transform'),"rotateY(180deg)");
+        $front.css(Modernizr.prefixed('transform'),"rotateY(0deg)");
     }
     function flipCard(deckNum){
-        var depth = $("#w"+(deckNum)).find(".post_overlay").length;
+        var depth = $("#w"+(deckNum)).find(".card").length;
         if (depth != 0){
-            yesFlipMe($("#w"+(deckNum)).find(".post_overlay")[depth].id);
+            yesFlipMe(($("#w"+(deckNum)).find(".card")[depth - 1]).id);
         }
     }
     function flipCards(){
-        for (var q = 7; q <= 13; q++){
-            flipCard(q);
+        var i = 7;
+        function flipCards1 () {
+            setTimeout(function () {
+                flipCard(i);
+                i++;
+                if (i <= 13) {
+                    flipCards1();
+                }
+            }, 300);
         }
+        setTimeout(function () {
+            flipCards1();
+        },300);
     }
     function deckEm() {
         var top = 0;
