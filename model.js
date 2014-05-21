@@ -222,7 +222,12 @@ function removeTable(stackNum, cardNum, isStack){
 				
 	}
 }
-
+//This function returns the card object of the card on top of the closed deck and adds it to the open stack
+function openStack(deckNum){
+	var d = closedStacks["stack"+deckNum];
+	addToTable(deckNum, d[d.length-1]);
+	return d.splice(d.length-1,1);
+}
 //internal function
 function getFoundationTop(foundNum){
 	var arr = foundationStacks["stack"+foundNum];

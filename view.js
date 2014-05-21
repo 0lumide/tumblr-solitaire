@@ -196,80 +196,82 @@
         }, 1000);
     }
     function distributeCards(){
-        ///*$.getScript( "ajax/test.js" )
-        //.done(function(){
-            //newGame();
-        var c = numCard;
-        var j = 7;
-        distributeCards1();
-        function distributeCards1(){
-            console.log("distributecard1");
-            var d = 0;
-            var i = j;
-            distributeCards2();
-            function distributeCards2(){
-                console.log("distributecard2");
-                console.log("i: "+i+" j: "+j+" d: "+d+" c: "+c);
-                setTimeout(function () {
-                    var depth = 0;
-                    var pos = $("#w"+(14 -i)).position();
-                    $orr = $("#c"+c);
-                    $orr1 = $("#c"+c--+" .back");
-                    $klone = $orr1.clone().insertAfter($orr);//.attr("id", $orr.attr("id")+"clone").insertAfter($orr);
-                    $klone.addClass("clone");
-                    $klone.css("z-index",(8-j));
-                    $klone.position();
-                    $orr.hide();
-                    $orr1.css("left","0px");
-                    $orr1.css("top","0px");
-                    $orr.css("left", 0);
-                    $orr.css("top", 0);
-                    if(j == 7)
-                        $orr.appendTo($("#w"+(14 - i)));
-                    else{
-                        $appendhere = $("#w"+(14 - i)).find(".post_overlay").last();
-                        $orr.appendTo($appendhere);
-                    }
-                    $orr1.css(Modernizr.prefixed('transition')+"-duration", "0.2s");
-                    console.log("here");
-                    if(j == 7){
-                        $klone.css("left", pos.left+"px");
-                        $klone.css("top", pos.top+"px")
-                        .one(transitionstuff, function(){
-                            d++;
-                            console.log("attached first");
-                        });
-                    }
-                    else{
-                        $appendhere = $("#w"+(14 -i)).find(".post_overlay").last();
-                        depth = $("#w"+(14 -i)).find(".post_overlay").length;
-                        $klone.css("left", pos.left+"px");
-                        $klone.removeClass("card");
-                        $klone.css("top", (pos.top +(depth-1)*(ex/2)+/*
-                        (depth-1)*pushRatio*height)+*/"px"))
-                        .one(transitionstuff, function(){
-                            console.log(d++);
-                            //console.log("attached");
-                            if(j==1){
-                                setTimeout(function () {
-                                    $(".clone").remove();
-                                    $(".card").show();
-                                    flipCards();
-                                }, 400);
-                            }
-                        });
-                    }
-                    if(--i>=1)
-                        distributeCards2();
-                    else if(--j>=1)
-                        distributeCards1();                    
-                }, 70);
+        $.getScript( "https://raw.githubusercontent.com/0lumide/tumblr-solitaire/master/model.js" )
+        .done(function(){
+            newGame();
+            var c = numCard;
+            var j = 7;
+            distributeCards1();
+            function distributeCards1(){
+                console.log("distributecard1");
+                var d = 0;
+                var i = j;
+                distributeCards2();
+                function distributeCards2(){
+                    console.log("distributecard2");
+                    console.log("i: "+i+" j: "+j+" d: "+d+" c: "+c);
+                    setTimeout(function () {
+                        var depth = 0;
+                        var pos = $("#w"+(14 -i)).position();
+                        $orr = $("#c"+c);
+                        $orr1 = $("#c"+c--+" .back");
+                        $klone = $orr1.clone().insertAfter($orr);//.attr("id", $orr.attr("id")+"clone").insertAfter($orr);
+                        $klone.addClass("clone");
+                        $klone.css("z-index",(8-j));
+                        $klone.position();
+                        $orr.hide();
+                        $orr1.css("left","0px");
+                        $orr1.css("top","0px");
+                        $orr.css("left", 0);
+                        $orr.css("top", 0);
+                        if(j == 7)
+                            $orr.appendTo($("#w"+(14 - i)));
+                        else{
+                            $appendhere = $("#w"+(14 - i)).find(".post_overlay").last();
+                            $orr.appendTo($appendhere);
+                        }
+                        $orr1.css(Modernizr.prefixed('transition')+"-duration", "0.2s");
+                        console.log("here");
+                        if(j == 7){
+                            $klone.css("left", pos.left+"px");
+                            $klone.css("top", pos.top+"px")
+                            .one(transitionstuff, function(){
+                                d++;
+                                console.log("attached first");
+                            });
+                        }
+                        else{
+                            $appendhere = $("#w"+(14 -i)).find(".post_overlay").last();
+                            depth = $("#w"+(14 -i)).find(".post_overlay").length;
+                            $klone.css("left", pos.left+"px");
+                            $klone.removeClass("card");
+                            $klone.css("top", (pos.top +(depth-1)*(ex/2)+/*
+                            (depth-1)*pushRatio*height)+*/"px"))
+                            .one(transitionstuff, function(){
+                                console.log(d++);
+                                //console.log("attached");
+                                if(j==1){
+                                    setTimeout(function () {
+                                        $(".clone").remove();
+                                        $(".card").show();
+                                        flipCards();
+                                    }, 400);
+                                }
+                            });
+                        }
+                        if(--i>=1)
+                            distributeCards2();
+                        else if(--j>=1)
+                            distributeCards1();                    
+                    }, 70);
+                }
             }
-        }
+        });
     }
     function yesFlipMe(id){
+        var cardish = openDeck(deckNum);
         $stuff = $(document.createElement("h2"));
-        $stuff.text("A");
+        $stuff.text(cardish.number + " " + cardish.suit);
         $front = $(document.createElement("div"));
         $stuff.appendTo($front);
         $front.attr("class","front");
