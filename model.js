@@ -36,17 +36,17 @@ function createStack(stack, cardOb, isStack) {
 		//stack["cardOb"] = null;
 		//stack["nextStack"] = null;
 		if (isStack){
-			stack.cardOb = cardOb.cardOb;
-			stack.nextStack = cardOb.nextStack;
+			stack[cardOb] = cardOb[cardOb];
+			stack[nextStack] = cardOb[nextStack];
 		}
 		else {
-			stack.cardOb = cardOb;
-			stack.nextStack = new Object();
+			stack[cardOb] = cardOb;
+			stack[nextStack] = new Object();
 			return stack;
 		}
 	}
 	else if (!isStack &&!stack.nextStack.hasOwnProperty("cardOb")){
-		stack.nextStack = createStack(nextStack, cardOb, isStack);
+		stack[nextStack] = createStack(nextStack, cardOb, isStack);
 	}
 	else
 		createStack(nextStack, cardOb, isStack);

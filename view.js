@@ -269,7 +269,7 @@
         });
     }
     function yesFlipMe(id){
-        var cardish = openDeck(deckNum);
+        var cardish = openStack(deckNum);
         $stuff = $(document.createElement("h2"));
         $stuff.text(cardish.number + " " + cardish.suit);
         $front = $(document.createElement("div"));
