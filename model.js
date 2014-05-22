@@ -1,8 +1,8 @@
-var openStacks = new Object();//Object.create(null);  //each child of closedStack is a stack
-var closedStacks = new Object();//Object.create(null);//each child of closedStack is a simple array
+var openStacks = {};//new Object();//Object.create(null);  //each child of closedStack is a stack
+var closedStacks = {};//new Object();//Object.create(null);//each child of closedStack is a simple array
 var cards = [];
 var cardIndex;
-var foundationStacks = new Object();//Object.create(null);
+var foundationStacks = {};//new Object();//Object.create(null);
 var trashpile;
 var gameScore;
 
@@ -36,20 +36,25 @@ function createStack(stack, cardOb, isStack) {
 		//stack["cardOb"] = null;
 		//stack["nextStack"] = null;
 		if (isStack){
-			stack["cardOb"] = cardOb[cardOb];
-			stack["nextStack"] = cardOb["nextStack"];
+			stack.cardOb = cardOb[cardOb];
+			stack.nextStack = cardOb.nextStack;
 		}
 		else {
-			stack["cardOb"] = cardOb;
-			stack["nextStack"] = new Object();
-			return stack;
+            console.log(cardOb);
+			console.log(cardOb.cardId);
+			stack.cardOb = cardOb;
+			stack.nextStack = {};
+			//return stack;
 		}
 	}
 	else if (!isStack &&!stack.nextStack.hasOwnProperty("cardOb")){
-		stack["nextStack"] = createStack(nextStack, cardOb, isStack);
+		console.log(cardOb.suit + cardOb.number + ">");
+		/*stack["nextStack"] = */createStack(stack.nextStack, cardOb, isStack);
 	}
-	else
+	else{
+		console.log("this shouldn't happen");
 		createStack(nextStack, cardOb, isStack);
+	}
 }
 //internal function
 function throwErr(mess){
@@ -60,10 +65,10 @@ function newGame() {
 	cardIndex = 0;
 	gameScore = 0;
 	for (var i=1; i<=7; i++){
-        openStacks["stack"+i] = new Object();
+        openStacks["stack"+i] = {};
 		//Object.defineProperty(openStacks, "stack"+i);
 	}
-	for (var i=2; i<=7; i++){
+	for (var i=1; i<=7; i++){
         closedStacks["stack"+i] = [];
 		//Object.defineProperty(closedStacks, "stack"+i);
 	}
@@ -74,36 +79,41 @@ function newGame() {
 	for (var i=1; i<=52; i++){
 		var j = i%13;
 		var color;
-		if (j == 0)
+		if (j === 0)
 			j = 13;
-		if(i>0){
-			suit = "spades";
-			color = "black";
-		}
-		else if(i>13){
-			suit = "hearts";
+		if(i>39){
+			suit = "diamond";
 			color = "red";
 		}
 		else if(i>26){
 			suit = "club";
 			color = "black";
 		}
-		else if(i>39){
-			suit = "diamond";
+		else if(i>13){
+			suit = "hearts";
 			color = "red";
+		}
+        else if(i>0){
+			suit = "spades";
+			color = "black";
 		}
 		var card = {cardId: i, suit : suit, color: color, number : j};
 		cards.push(card);
+        //console.log(cards[cards.length-1]);
         //cards[cards.length] = card;
 	}
 	
-	shuffle(cards);
+	cards = shuffle(cards);
 	for (var i = 1; i<=7; i++){
-		for(var j = 1; j < i; j++)
-			closedStacks["stack"+i].push(cards.splice(0,1));
+		for(var j = 0; j < i; j++){
+			console.log(i + ": " + cards[0].suit + cards[0].number);
+            var q = cards.splice(0,1)[0];
+            console.log(q);
+			closedStacks["stack"+i].push(q);
+		}
 	}
 	for (var i = 1; i<=7; i++){
-		createStack(openStacks["stack"+i], cards.splice(0,1), false);
+		createStack(openStacks["stack"+i], cards.splice(0,1)[0], false);
 	}
 }
 
@@ -123,13 +133,13 @@ function nextCard(){
 
 //internal function
 function useCard() {
-	if (cardIndex == 0)
+	if (cardIndex === 0)
 		return -3;
-	return cards.splice(--cardIndex, 1);
+	return cards.splice(--cardIndex, 1)[0];
 }
 //internal function
 function getWasteTop() {
-	if (cardIndex == 0)
+	if (cardIndex === 0)
 		return -3;
 	return cards[cardIndex -1];
 }
@@ -155,10 +165,10 @@ function getTable(stackNum, cardNum, isStack){
 		var stack = openStacks["stack"+stackNum];
 		while(dontstop){
             if (!stack.nextStack.hasOwnProperty("cardOb")){//(stack.nextStack == null){
-				if(cardNum = "last"){
+				if(cardNum == "last"){
 					dontstop = false;
                     if (isStack)
-					    return stack;
+                        return stack;
                     else
                         return stack.cardOb;
 				}
@@ -198,10 +208,10 @@ function removeTable(stackNum, cardNum, isStack){
 		var stack = openStacks["stack"+stackNum];
 		while(dontstop){
             if (!stack.nextStack.hasOwnProperty("cardOb")){//(stack.nextStack == null){
-				if(cardNum = "last"){
+				if(cardNum == "last"){
 					dontstop = false;
-					    stack.cardOb = new Object();
-                    	stack.nextStack = new Object();
+                    stack.cardOb = {};
+                    stack.nextStack = {};
                 }
 				else if(count != cardNum){
 					dontstop = false;
@@ -211,8 +221,8 @@ function removeTable(stackNum, cardNum, isStack){
 			}
 			else if(count == cardNum){
 				dontstop = false;
-				stack.cardOb = new Object();
-            	stack.nextStack = new Object();
+				stack.cardOb = {};
+                stack.nextStack = {};
 			}
 			else{ 
 				count++;
@@ -225,13 +235,14 @@ function removeTable(stackNum, cardNum, isStack){
 //This function returns the card object of the card on top of the closed deck and adds it to the open stack
 function openStack(deckNum){
 	var d = closedStacks["stack"+deckNum];
-	addToTable(deckNum, d[d.length-1]);
-	return d.splice(d.length-1,1);
+    console.log("poop");
+    addToTable(deckNum, d[d.length-1]);
+	return d.splice(d.length-1,1)[0];
 }
 //internal function
 function getFoundationTop(foundNum){
 	var arr = foundationStacks["stack"+foundNum];
-	if (arr.length == 0)
+	if (arr.length === 0)
 		return 0;
 	return(arr[arr.length - 1]);
 }
@@ -248,7 +259,7 @@ function wasteToFoundation(foundNum){
 		return(-2);
 }
 function wasteToTable(tableNum){
-    if(tableNum == undefined)
+    if(tableNum === undefined)
         return -3;
 	var card;
 	var tableTop = getTableCard(tableNum, "last");
@@ -271,7 +282,7 @@ function wasteToTable(tableNum){
 function foundationToTable(foundNum, tableNum){
 	var tableTop = getTableCard(tableNum, "last");
 	var foundTop = getFoundationTop(foundNum);
-	if(foundTop == 0){
+	if(foundTop === 0){
 		return(-3); //this should never get called
 	}
 	else if((tableTop -1) == foundTop){
@@ -288,7 +299,7 @@ function tableToFoundation(tableNum, foundNum) {
 	if (tableTop == 1){
 		return -3;
 	}
-	else if(((foundTop == 0)&&(tableTop.number == 1))||(((foundTop.number + 1) == tableTop.number)&&(tableTop.shape == foundTop.shape))){
+	else if(((foundTop === 0)&&(tableTop.number == 1))||(((foundTop.number + 1) == tableTop.number)&&(tableTop.shape == foundTop.shape))){
 		score+=10;
 		addToFoundation(foundNum, tableTop);
 		removeTable(tableNum, "last", false);
@@ -309,16 +320,12 @@ function tableToTable(tableNum1, tableNum2, cardNum){
     var cardHead = getTableCard(tableNum, cardNum); 
     var tableTop = getTableCard(tableNum, "last");
     if((cardHead.color != tableTop.color)&&((cardHead.number+1)== tableTop.number)){
-    	removeTable(tableNum1, cardNum, true);
+        removeTable(tableNum1, cardNum, true);
         addStackToTable(tableNum2, getTableStack(tableNum1, cardNum));
     }
     else
         return -2;
 }    
-
-/*
 newGame();
 nextCard();
-console.log(getScore());
-wasteToTable(1);
-*/
+console.log(openStack(1));
